@@ -1,0 +1,7 @@
+{
+  "name": "VoxGuard AI Detection",
+  "description": "Enterprise-grade AI-generated voice detection for Tamil, English, Hindi, Malayalam, and Telugu audio samples.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}

@@ -1,0 +1,202 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>J.A.R.V.I.S. | Neural Interface</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --stark-blue: #00a8ff;
+            --stark-cyan: #00f3ff;
+            --stark-dark: #020d18;
+            --stark-glass: #020d18; /* Changed to solid color */
+            --stark-border: rgba(0, 168, 255, 0.2);
+            --alert-orange: #ff4500;
+        }
+
+        body { 
+            font-family: 'Rajdhani', sans-serif; 
+            background-color: #000;
+            color: var(--stark-cyan);
+            overflow-y: auto; /* Enabled scrolling */
+            overflow-x: hidden;
+            height: 100vh;
+            margin: 0;
+            cursor: none; /* Custom cursor used in App */
+        }
+
+        .font-tech { font-family: 'Share Tech Mono', monospace; }
+        .font-header { font-family: 'Orbitron', sans-serif; }
+
+        /* --- J.A.R.V.I.S. HUD OVERLAY --- */
+        .hud-overlay {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 50; /* Lower z-index so it doesn't block clicks if pointers enabled */
+            background: 
+                radial-gradient(circle at center, transparent 60%, rgba(0, 10, 20, 0.8) 100%),
+                linear-gradient(rgba(0, 168, 255, 0.02) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 4px;
+        }
+
+        .hud-vignette {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 50;
+            background: radial-gradient(circle, transparent 50%, #000 130%);
+        }
+
+        .scanline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 10px;
+            background: linear-gradient(to bottom, transparent, rgba(0, 243, 255, 0.1), transparent);
+            animation: scan 6s linear infinite;
+            pointer-events: none;
+            z-index: 50;
+            opacity: 0.3;
+        }
+
+        @keyframes scan {
+            0% { top: -10%; }
+            100% { top: 110%; }
+        }
+
+        /* --- ARC REACTOR BACKGROUND --- */
+        .arc-bg {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80vh;
+            height: 80vh;
+            border-radius: 50%;
+            border: 1px solid rgba(0, 168, 255, 0.05);
+            z-index: -1;
+            pointer-events: none;
+        }
+        
+        .arc-ring {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            border: 1px solid rgba(0, 168, 255, 0.1);
+            box-shadow: 0 0 10px rgba(0, 168, 255, 0.05);
+        }
+
+        .spin-slow { animation: spin 60s linear infinite; }
+        .spin-reverse { animation: spin 45s linear infinite reverse; }
+
+        @keyframes spin { 100% { transform: translate(-50%, -50%) rotate(360deg); } }
+
+        /* --- SYSTEM TRANSITIONS --- */
+        .construct-in {
+            animation: construct 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+        }
+
+        @keyframes construct {
+            0% { 
+                opacity: 0;
+                transform: scale(0.95) perspective(1000px) rotateX(10deg);
+                filter: blur(10px);
+            }
+            100% { 
+                opacity: 1;
+                transform: scale(1) perspective(1000px) rotateX(0deg);
+                filter: blur(0px);
+            }
+        }
+
+        /* --- UI COMPONENTS --- */
+        .stark-panel {
+            background: #020d18; /* Solid Stark Dark */
+            border: 1px solid rgba(0, 168, 255, 0.2);
+            position: relative;
+            box-shadow: 0 0 20px rgba(0, 168, 255, 0.05);
+            z-index: 10;
+        }
+        
+        .stark-panel::before {
+            content: '';
+            position: absolute;
+            top: -1px; left: -1px;
+            width: 10px; height: 10px;
+            border-top: 2px solid var(--stark-cyan);
+            border-left: 2px solid var(--stark-cyan);
+        }
+        .stark-panel::after {
+            content: '';
+            position: absolute;
+            bottom: -1px; right: -1px;
+            width: 10px; height: 10px;
+            border-bottom: 2px solid var(--stark-cyan);
+            border-right: 2px solid var(--stark-cyan);
+        }
+
+        .holo-text {
+            text-shadow: 0 0 5px rgba(0, 243, 255, 0.5);
+        }
+
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #020d18; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #005f99; border-radius: 2px; }
+
+        /* Glitch Text */
+        .glitch-load {
+            animation: glitch-anim 0.3s infinite;
+        }
+        @keyframes glitch-anim {
+            0% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+            100% { transform: translate(0); }
+        }
+        
+        /* Progress Animation */
+        @keyframes progress {
+            0% { width: 0%; }
+            50% { width: 70%; }
+            100% { width: 100%; }
+        }
+        .animate-progress {
+            animation: progress 2s ease-in-out infinite;
+        }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3",
+    "@google/genai": "https://esm.sh/@google/genai@^1.38.0",
+    "lucide-react": "https://esm.sh/lucide-react@^0.563.0",
+    "recharts": "https://esm.sh/recharts@^3.7.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/"
+  }
+}
+</script>
+</head>
+<body>
+    <div class="hud-overlay"></div>
+    <div class="hud-vignette"></div>
+    <div class="scanline"></div>
+    
+    <!-- Background Architecture -->
+    <div class="arc-bg">
+        <div class="arc-ring w-[120%] h-[120%] border-dashed opacity-20 spin-slow"></div>
+        <div class="arc-ring w-[80%] h-[80%] border-dotted opacity-30 spin-reverse"></div>
+        <div class="arc-ring w-[60%] h-[60%] border opacity-10"></div>
+    </div>
+
+    <div id="root"></div>
+</body>
+</html>
